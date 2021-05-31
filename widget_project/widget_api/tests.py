@@ -7,7 +7,12 @@ from .models import Widget
 from zoneinfo import ZoneInfo
 import time_machine
 
-future_test_date = datetime(2222, 3, 4, tzinfo=ZoneInfo('America/Denver'))
+future_test_dt = datetime(2222, 3, 4, tzinfo=ZoneInfo('America/Denver'))
+future_test_date = date(
+    future_test_dt.year,
+    future_test_dt.month,
+    future_test_dt.day
+)
 
 
 class WidgetTests(TestCase):
@@ -95,7 +100,8 @@ class WidgetTests(TestCase):
             **{'name': 'sample', 'number_of_parts': None}
         )
 
-    @time_machine.travel(future_test_date)
+    # use future_test_dt because it has tz
+    @time_machine.travel(future_test_dt)
     def test_widget_updated_date(self):
         """
         test_widget_updated_date():
@@ -103,8 +109,10 @@ class WidgetTests(TestCase):
             time that widget is updated
             simulate date in future with time_machine
         """
+        global future_test_date
+
         widget_create_vals = self._widget_create[0]
         widget = Widget.objects.get(**widget_create_vals)
         widget.number_of_parts += 1
         widget.save()
-        self.assertEqual(date(2222, 3, 4), widget.updated_date)
+        self.assertEqual(future_test_date, widget.updated_date)
