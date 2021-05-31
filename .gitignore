@@ -1,3 +1,4 @@
 widget_project/db.sqlite3
 __pycache__
 env/
+.DS_Store
